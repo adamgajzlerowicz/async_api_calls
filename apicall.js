@@ -1,6 +1,6 @@
 var mysql  = require('mysql');
+var async = require('async')
 
-var async = require('async');
 
 // var connection = mysql.createConnection({
 // 	host     : '10.0.0.2',
@@ -19,14 +19,11 @@ var connection = mysql.createConnection({
 
 var inputData = [];
 
-for(i=1; i<=5000;i++){
+for(i=1; i<=3;i++){
 	inputData.push('number' + i);
 }
 
-// var options = {
-// 	url: 'http://10.0.0.2/test.txt',
-// 	maxSockets: 1
-// };
+
 
 // var options = {
 // 	host: "10.0.0.2",
@@ -41,8 +38,8 @@ var options = {
 	host: "localhost",
 	port: 80,
 	path: "/text.txt",
-	keepAlive: true,
-	maxSockets: 10,
+	keepAlive: false,
+	maxSockets: 999,
 	maxFreeSockets: 1
 }
 
@@ -81,23 +78,6 @@ function fetchData(number){
 		req.end();
 
 	})
-
-
-	// return new Promise(function(resolve, reject){
-	// 	request(options, function(error, response, body) {
-	// 		if (error){
-	// 			return reject(error);
-	// 		}			
-	// 		var time = (new Date().getTime()/1000)
-	// 		connection.query("insert into testAPI (name) values ('" + time + body +"')", function(err, rows, fields) {
-	// 			if (err) {
-	// 				return reject(err);
-	// 			};
-	// 			console.log(time + body + '  dupa')
-	// 			resolve()
-	// 		});
-	// 	})
-	// })
 }
 
 
@@ -112,59 +92,5 @@ Promise.all(inputData.map(number => fetchData(number))).then(function(results) {
 .catch(function(error) {
 	console.log('there wa an error');
 	console.log(error);
-	// One or more promises was rejected
 });
-
-
-//async solution
-
-
-// async.each(inputData, function(number,callback){
-	
-// 	fetchData(number).then(function(response){
-
-// 		var time = (new Date().getTime()/1000)
-
-// 		connection.query("insert into testAPI (name) values ('" + time + response +"')", function(err, rows, fields) {
-
-// 			if (err) {
-// 				return reject(err);
-// 			};
-
-// 			console.log(time + response + '  dupa')
-
-// 		});
-
-// 	})
-// }, function(err, item){
-// 	console.log(err + item);
-// });
-
-
-
-
-
-
-
-//foreach solution:
-
-
-// inputData.forEach(function(number){
-// 	fetchData(number).then(function(response){
-
-// 		var time = (new Date().getTime()/1000)
-
-// 		connection.query("insert into testAPI (name) values ('" + time + response +"')", function(err, rows, fields) {
-
-// 			if (err) {
-// 				return reject(err);
-// 			};
-
-// 			console.log(time + response + '  dupa')
-
-// 		});
-
-// 	})
-// })
-
 
