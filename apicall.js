@@ -1,15 +1,6 @@
 var mysql  = require('mysql');
 var async = require('async')
 
-
-// var connection = mysql.createConnection({
-// 	host     : '10.0.0.2',
-// 	user     : 'root',
-// 	password : '123qwe!Q',
-// 	database : 'testAPI'
-// });
-
-
 var connection = mysql.createConnection({
 	host     : 'localhost',
 	user     : 'root',
@@ -19,36 +10,21 @@ var connection = mysql.createConnection({
 
 var inputData = [];
 
-for(i=1; i<=3;i++){
+for(i=1; i<=2000;i++){
 	inputData.push('number' + i);
 }
 
-
-
-// var options = {
-// 	host: "10.0.0.2",
-// 	port: 80,
-// 	path: "/test.txt",
-// 	keepAlive: true,
-// 	maxSockets: 10,
-// 	maxFreeSockets: 1
-// }
-
 var options = {
-	host: "localhost",
+	//host: "localhost",
+	//path: "/text.txt",
+	host: "o2.pl",
+	path: "/static/desktop.css?v=0.0.417",
 	port: 80,
-	path: "/text.txt",
 	keepAlive: false,
 	maxSockets: 999,
 	maxFreeSockets: 1
 }
-
-
-
-var limit = inputData.length;
-var counter = 0;
-
-function fetchData(number){
+function fetchData(number, callback){
 
 	return new Promise(function(resolve, reject){
 		var http = require('http');
@@ -64,13 +40,14 @@ function fetchData(number){
 					if (err) {
 						return reject(err);
 					};
-					//console.log(time + body + '  dupa')
-					 process.stdout.write('.')
-					resolve()
+					process.stdout.write('.')
+					callback()
 				});
 			})
 			resp.on('error',function(err){
 				console.log('error');
+				console.log(err);
+
 			})
 		}
 		var req = http.request(options, fetch);
@@ -80,17 +57,12 @@ function fetchData(number){
 	})
 }
 
+function foo(item, callback){
 
+	return callback(false, 'foo');
+}
 
-
-
-Promise.all(inputData.map(number => fetchData(number))).then(function(results) {
+async.mapLimit(inputData,1000,fetchData,function(err, result){
 	console.log('finished');
 	connection.end();
-
 })
-.catch(function(error) {
-	console.log('there wa an error');
-	console.log(error);
-});
-
