@@ -1,3 +1,4 @@
+var http = require('http');
 var mysql  = require('mysql');
 var async = require('async')
 
@@ -10,24 +11,18 @@ var connection = mysql.createConnection({
 
 var inputData = [];
 
-for(i=1; i<=2000;i++){
+for(i=1; i<=5000;i++){
 	inputData.push('number' + i);
 }
 
 var options = {
-	//host: "localhost",
-	//path: "/text.txt",
 	host: "o2.pl",
 	path: "/static/desktop.css?v=0.0.417",
 	port: 80,
-	keepAlive: false,
-	maxSockets: 999,
-	maxFreeSockets: 1
 }
 function fetchData(number, callback){
 
-	return new Promise(function(resolve, reject){
-		var http = require('http');
+	//return new Promise(function(resolve, reject){
 
 		fetch  = function(resp){
 			var body = '';
@@ -54,15 +49,12 @@ function fetchData(number, callback){
 
 		req.end();
 
-	})
+	//})
 }
 
-function foo(item, callback){
 
-	return callback(false, 'foo');
-}
 
-async.mapLimit(inputData,1000,fetchData,function(err, result){
+async.mapLimit(inputData,100,fetchData,function(err, result){
 	console.log('finished');
 	connection.end();
 })
