@@ -1,13 +1,29 @@
 var http = require('http');
-var mysql  = require('mysql');
+var MongoClient = require('mongodb').MongoClient;
+var assert = require('assert');
 var async = require('async')
-
-var connection = mysql.createConnection({
-	host     : 'localhost',
-	user     : 'root',
-	password : '123',
-	database : 'testAPI'
+var notifier = require('node-notifier');
+notifier.notify({
+  'title': 'My notification',
+  'message': 'Hello, there!'
 });
+http.globalAgent.maxSockets = 5;
+
+var assert = require('assert');
+var ObjectId = require('mongodb').ObjectID;
+var mongoDBurl = 'mongodb://localhost:27017/testAPI';
+
+
+var insertDocument = function(data, callback) {
+	data.db.collection('numbers ').insertOne( {
+		"content" : data.content
+	}, function(err, result) {
+		assert.equal(err, null);
+		process.stdout.write('.');
+		callback(result);
+	});
+}
+
 
 var inputData = [];
 
@@ -17,7 +33,7 @@ for(i=1; i<=5000;i++){
 
 var options = {
 	host: "o2.pl",
-	path: "/static/desktop.css?v=0.0.417",
+	path: "/static/desktop.css",
 	port: 80,
 }
 function fetchData(number, callback){
@@ -31,13 +47,23 @@ function fetchData(number, callback){
 			})
 			resp.on('end',function(){
 				var time = (new Date().getTime()/1000)
-				connection.query("insert into testAPI (name) values ('" + time + body +"')", function(err, rows, fields) {
-					if (err) {
-						return reject(err);
-					};
-					process.stdout.write('.')
-					callback()
+
+				MongoClient.connect(mongoDBurl, function(err, db) {
+					assert.equal(null, err);
+					db.db = db;
+					db.data = time + body;
+					insertDocument(db, function() {
+						db.close()
+						callback()
+					});
 				});
+
+
+
+
+
+
+
 			})
 			resp.on('error',function(err){
 				console.log('error');
@@ -56,5 +82,5 @@ function fetchData(number, callback){
 
 async.mapLimit(inputData,100,fetchData,function(err, result){
 	console.log('finished');
-	connection.end();
+	db.close();
 })
